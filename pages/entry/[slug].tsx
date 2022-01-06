@@ -1,41 +1,21 @@
 import { GetStaticProps, InferGetStaticPropsType, GetStaticPaths } from 'next'
 import Link from 'next/link'
-// import { useRouter } from 'next/router'
 
-import { getCategoryList, getPlant, getPlantList } from '@api'
-import { AuthorCard } from '@components/AuthorCard'
+import { getPlant, getPlantList, getCategoryList } from '@api'
+
 import { Layout } from '@components/Layout'
+import { Typography } from '@ui/Typography'
+import { Grid } from '@ui/Grid'
+
 import { RichText } from '@components/RichText'
-import { Grid, Typography } from '@material-ui/core'
+import { AuthorCard } from '@components/AuthorCard'
 import { PlantEntryInline } from '@components/PlantCollection'
 import { Image } from '@components/Image'
 
-type PathType = {
-  params: {
-    slug: string
-  }
-}
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const entries = await getPlantList({ limit: 10 })
-
-  const paths: PathType[] = entries.map((plant) => ({
-    params: {
-      slug: plant.slug,
-    },
-  }))
-
-  return {
-    paths,
-    // fallback: true,
-    fallback: 'blocking',
-  }
-}
-
 type PlantEntryPageProps = {
   plant: Plant
-  otherEntries: Plant[] | null
-  categories: Category[] | null
+  otherEntries: Plant[]
+  categories: Category[]
 }
 
 export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
@@ -68,17 +48,36 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
   }
 }
 
-const PlantEntryPage = ({
+type PathType = {
+  params: {
+    slug: string
+  }
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Match home query.
+  // @TODO how do we generate all of our pages if we don't know the number? 🤔
+  const plantEntriesToGenerate = await getPlantList({ limit: 10 })
+
+  const paths: PathType[] = plantEntriesToGenerate.map(({ slug }) => ({
+    params: {
+      slug,
+    },
+  }))
+
+  return {
+    paths,
+
+    // Block until the server gets its data. Like in Server side rendering
+    fallback: 'blocking',
+  }
+}
+
+export default function PlantEntryPage({
   plant,
-  categories,
   otherEntries,
-}: InferGetStaticPropsType<typeof getStaticProps>) => {
-  // const router = useRouter()
-
-  // if (router.isFallback) {
-  //   return <Layout>Loading awesomeness...</Layout>
-  // }
-
+  categories,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <Layout>
       <Grid container spacing={4}>
@@ -95,16 +94,16 @@ const PlantEntryPage = ({
           <div className="px-12 pt-8">
             <Typography variant="h2">{plant.plantName}</Typography>
           </div>
-          <div className="pt-10">
+          <div className="p-10">
             <RichText richText={plant.description} />
           </div>
         </Grid>
         <Grid item xs={12} md={4} lg={3} component="aside">
           <section>
             <Typography variant="h5" component="h3" className="mb-4">
-              Recent Posts
+              Recent posts
             </Typography>
-            {otherEntries?.map((plantEntry) => (
+            {otherEntries.map((plantEntry) => (
               <article className="mb-4" key={plantEntry.id}>
                 <PlantEntryInline {...plantEntry} />
               </article>
@@ -115,7 +114,7 @@ const PlantEntryPage = ({
               Categories
             </Typography>
             <ul className="list">
-              {categories?.map((category) => (
+              {categories.map((category) => (
                 <li key={category.id}>
                   <Link passHref href={`/category/${category.slug}`}>
                     <Typography component="a" variant="h6">
@@ -134,5 +133,3 @@ const PlantEntryPage = ({
     </Layout>
   )
 }
-
-export default PlantEntryPage

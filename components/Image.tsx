@@ -58,7 +58,7 @@ const aspectRatioToRatio: Record<AspectRatio, number> = {
   '9:12': 12 / 9,
 }
 
-function calcAspectRatio(aspectRatio: AspectRatio, width: number) {
+function calcAspectRatio(aspectRatio: AspectRatio, width: number): number {
   const ratio = aspectRatioToRatio[aspectRatio]
 
   return Math.floor(width * ratio)

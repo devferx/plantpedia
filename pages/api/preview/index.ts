@@ -24,7 +24,6 @@ const enablePreview: NextApiHandler = async (request, response) => {
     // We don't redirect to request.query.slug as that might lead to open redirect vulnerabilities
     response.redirect(`/entry/${plant.slug}`)
   } catch (e) {
-    console.error(e)
     if (process.env.NODE_ENV !== 'production') {
       console.error(e)
     }

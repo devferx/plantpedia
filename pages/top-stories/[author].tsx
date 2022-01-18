@@ -16,8 +16,6 @@ import ErrorPage from '../_error'
 
 type TopStoriesPageProps = {
   authors: Author[]
-  currentAuthor: Author['handle']
-  status: 'error' | 'sucess'
 }
 
 export const getServerSideProps: GetServerSideProps<TopStoriesPageProps> =
@@ -45,35 +43,27 @@ export const getServerSideProps: GetServerSideProps<TopStoriesPageProps> =
       return {
         props: {
           authors,
-          currentAuthor: authorHandle,
-          status: 'sucess',
         },
       }
     } catch (e) {
       return {
-        props: {
-          authors: [],
-          currentAuthor: authorHandle,
-          status: 'error',
-        },
+        notFound: true,
       }
     }
   }
 
 export default function TopStories({
   authors,
-  status,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  // router -> currentAuthor // cambiar author
+  // Heads-up: `router.query` comes populated from the server as we are using `getServerSideProps`
+  // which means, `router.query.author` will be ready since the very first render.
   const router = useRouter()
   const currentAuthor = router.query.author
 
-  if (
-    typeof currentAuthor !== 'string' ||
-    authors.length === 0 ||
-    status === 'error'
-  ) {
-    return <ErrorPage message="Huh, something went wrong" />
+  if (typeof currentAuthor !== 'string' || authors.length === 0) {
+    return (
+      <ErrorPage message="There is no information available. Did you forget to set up your Contenful space's content?" />
+    )
   }
 
   const tabs: TabItem[] = authors.map((author) => ({

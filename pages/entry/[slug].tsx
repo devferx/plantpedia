@@ -32,7 +32,11 @@ export const getStaticProps: GetStaticProps<PlantEntryPageProps> = async ({
 
   try {
     const plant = await getPlant(slug, preview)
-    const otherEntries = await getPlantList({ limit: 5 })
+
+    // Sidebar – This could be a single request since we are using GraphQL :)
+    const otherEntries = await getPlantList({
+      limit: 5,
+    })
     const categories = await getCategoryList({ limit: 10 })
     return {
       props: {

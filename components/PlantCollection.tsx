@@ -34,18 +34,12 @@ const isEqual = (previousProps: PlantEntryType, newProps: PlantEntryType) => {
   // "Cherry-picking" the important props for the app gives the best result here
   return previousProps.plant.plantName === newProps.plant.plantName
 }
-const MemoizedPlantEntry = memo(PlantEntry, isEqual)
+export const MemoizedPlantEntry = memo(PlantEntry, isEqual)
 
 type PlantEntryType = {
   plant: Plant
   variant?: 'square' | 'vertical'
 }
-
-const isEqual = (previousProps: PlantEntryType, newProps: PlantEntryType) => {
-  return previousProps.plant.plantName === newProps.plant.plantName
-}
-
-export const MemoizedPlantEntry = memo(PlantEntry, isEqual)
 
 export function PlantEntry({ plant, variant = 'square' }: PlantEntryType) {
   let gridItemProps: GridProps = { xs: 6, md: 4 }

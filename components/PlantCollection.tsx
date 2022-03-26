@@ -27,6 +27,15 @@ export function PlantCollection({
   )
 }
 
+const isEqual = (previousProps: PlantEntryType, newProps: PlantEntryType) => {
+  // What's the property React has to know the component has to be updated?
+  // Even though lodash.isEqual could be used here, it could also lead to perf issues
+  // for big & deep nested objects.
+  // "Cherry-picking" the important props for the app gives the best result here
+  return previousProps.plant.plantName === newProps.plant.plantName
+}
+const MemoizedPlantEntry = memo(PlantEntry, isEqual)
+
 type PlantEntryType = {
   plant: Plant
   variant?: 'square' | 'vertical'

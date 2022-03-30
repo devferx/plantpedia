@@ -7,8 +7,12 @@ const options: NextAuthOptions = {
   theme: {
     colorScheme: 'dark',
   },
-  debug: true,
-  session: {},
+  debug: process.env.NODE_ENV === 'development',
+  session: {
+    // Use JWT to manage sessions since we aren't using a Database
+    strategy: 'jwt',
+    maxAge: 60 * 15, // 15 min
+  },
   jwt: {},
   secret: process.env.AUTH_PLATZI_SECRET,
   providers: [
